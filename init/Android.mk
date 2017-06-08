@@ -95,8 +95,16 @@ ifneq ($(TARGET_IGNORE_RO_BOOT_SERIALNO),)
 LOCAL_CFLAGS += -DIGNORE_RO_BOOT_SERIALNO
 endif
 
+ifneq ($(TARGET_IGNORE_RO_BOOT_REVISION),)
+LOCAL_CFLAGS += -DIGNORE_RO_BOOT_REVISION
+endif
+
 ifeq ($(KERNEL_HAS_FINIT_MODULE), false)
 LOCAL_CFLAGS += -DNO_FINIT_MODULE
+endif
+
+ifneq ($(TARGET_INIT_UMOUNT_AND_FSCK_IS_UNSAFE),)
+LOCAL_CFLAGS += -DUMOUNT_AND_FSCK_IS_UNSAFE
 endif
 
 LOCAL_MODULE:= init
@@ -123,7 +131,7 @@ LOCAL_STATIC_LIBRARIES := \
     libc \
     libselinux \
     liblog \
-    libmincrypt \
+    libcrypto_utils_static \
     libcrypto_static \
     libext2_blkid \
     libext2_uuid_static \

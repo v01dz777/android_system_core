@@ -114,6 +114,7 @@ enum ConnectionState {
     kCsNoPerm,  // Insufficient permissions to communicate with the device.
     kCsSideload,
     kCsUnauthorized,
+    kCsOnline,
 };
 
 /* A listener is an entity which binds to a local port
@@ -229,6 +230,8 @@ int is_adb_interface(int vid, int pid, int usb_class, int usb_subclass, int usb_
 #endif
 
 ConnectionState connection_state(atransport *t);
+
+extern int recovery_mode;
 
 extern const char* adb_device_banner;
 

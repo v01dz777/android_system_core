@@ -34,7 +34,7 @@ LOCAL_SRC_FILES := \
     BatteryPropertiesRegistrar.cpp \
 
 LOCAL_MODULE := libhealthd_internal
-LOCAL_C_INCLUDES := bootable/recovery
+LOCAL_C_INCLUDES := $(call project-path-for,recovery)
 LOCAL_EXPORT_C_INCLUDE_DIRS := \
     $(LOCAL_PATH) \
     $(LOCAL_PATH)/include \
@@ -54,7 +54,6 @@ LOCAL_STATIC_LIBRARIES := \
     libc \
 
 include $(BUILD_STATIC_LIBRARY)
-
 
 include $(CLEAR_VARS)
 
@@ -131,7 +130,7 @@ endif
 
 # Symlink /charger to /sbin/healthd
 LOCAL_POST_INSTALL_CMD := $(hide) mkdir -p $(TARGET_ROOT_OUT) \
-    && ln -sf /sbin/healthd $(TARGET_ROOT_OUT)/charger
+    && rm -f $(TARGET_ROOT_OUT)/charger && ln -sf /sbin/healthd $(TARGET_ROOT_OUT)/charger
 
 include $(BUILD_EXECUTABLE)
 
@@ -149,8 +148,13 @@ include $$(BUILD_PREBUILT)
 endef
 
 _img_modules :=
+ifeq ($(strip $(BOARD_HEALTHD_CUSTOM_CHARGER_RES)),)
+IMAGES_DIR := images
+else
+IMAGES_DIR := ../../../$(BOARD_HEALTHD_CUSTOM_CHARGER_RES)
+endif
 _images :=
-$(foreach _img, $(call find-subdir-subdir-files, "images", "*.png"), \
+$(foreach _img, $(call find-subdir-subdir-files, "$(IMAGES_DIR)", "*.png"), \
   $(eval $(call _add-charger-image,$(_img))))
 
 include $(CLEAR_VARS)

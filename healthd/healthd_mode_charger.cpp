@@ -260,8 +260,8 @@ static int set_tricolor_led(int on, int color)
         if ((color & leds[i].color) && (access(leds[i].path, R_OK | W_OK) == 0)) {
             fd = open(leds[i].path, O_RDWR);
             if (fd < 0) {
-                LOGE("Could not open red led node\n");
-                goto cleanup;
+                LOGE("Could not open led node %d\n", i);
+                continue;
             }
             if (on)
                 snprintf(buffer, sizeof(int), "%d\n", 255);
@@ -270,7 +270,6 @@ static int set_tricolor_led(int on, int color)
 
             if (write(fd, buffer, strlen(buffer)) < 0)
                 LOGE("Could not write to led node\n");
-cleanup:
             if (fd >= 0)
                 close(fd);
         }
@@ -788,6 +787,11 @@ static void process_key(struct charger *charger, int code, int64_t now)
                 }
             }
         }
+    } else {
+        if (key->pending) {
+            request_suspend(false);
+            kick_animation(charger->batt_anim);
+        }
     }
 
     key->pending = false;
@@ -796,6 +800,7 @@ static void process_key(struct charger *charger, int code, int64_t now)
 static void handle_input_state(struct charger *charger, int64_t now)
 {
     process_key(charger, KEY_POWER, now);
+    process_key(charger, KEY_HOME, now);
 
     if (charger->next_key_check != -1 && now > charger->next_key_check)
         charger->next_key_check = -1;
