@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2013 The Android Open Source Project
+ * Copyright (C) 2015 The CyanogenMod Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,8 +44,11 @@ using namespace android;
 #endif
 
 #ifndef BOARD_PERIODIC_CHORES_INTERVAL_SLOW
-  // Periodic chores fast interval in seconds
+ #ifdef QCOM_HARDWARE
+  #define DEFAULT_PERIODIC_CHORES_INTERVAL_SLOW -1
+ #else
   #define DEFAULT_PERIODIC_CHORES_INTERVAL_SLOW (60 * 10)
+ #endif
 #else
   #define DEFAULT_PERIODIC_CHORES_INTERVAL_SLOW (BOARD_PERIODIC_CHORES_INTERVAL_SLOW)
 #endif
@@ -67,6 +71,18 @@ static struct healthd_config healthd_config = {
     .energyCounter = NULL,
     .boot_min_cap = 0,
     .screen_on = NULL,
+    .dockBatterySupported = false,
+    .dockBatteryStatusPath = String8(String8::kEmptyString),
+    .dockBatteryHealthPath = String8(String8::kEmptyString),
+    .dockBatteryPresentPath = String8(String8::kEmptyString),
+    .dockBatteryCapacityPath = String8(String8::kEmptyString),
+    .dockBatteryVoltagePath = String8(String8::kEmptyString),
+    .dockBatteryTemperaturePath = String8(String8::kEmptyString),
+    .dockBatteryTechnologyPath = String8(String8::kEmptyString),
+    .dockBatteryCurrentNowPath = String8(String8::kEmptyString),
+    .dockBatteryCurrentAvgPath = String8(String8::kEmptyString),
+    .dockBatteryChargeCounterPath = String8(String8::kEmptyString),
+    .dockEnergyCounter = NULL,
 };
 
 static int eventct;
@@ -187,6 +203,10 @@ static void wakealarm_set_interval(int interval) {
 
 status_t healthd_get_property(int id, struct BatteryProperty *val) {
     return gBatteryMonitor->getProperty(id, val);
+}
+
+status_t healthd_get_dock_property(int id, struct BatteryProperty *val) {
+    return gBatteryMonitor->getDockProperty(id, val);
 }
 
 void healthd_battery_update(void) {
